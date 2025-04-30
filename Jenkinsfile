@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-	    SERVICE_REPO_NAME = 'RTM_UserService'
+	    SERVICE_REPO_NAME = 'RTM_UserService.git'
 	    DOCKER_IMAGE = 'rtm-user-service'
 	    SERVICE_NAME = 'user-service'
 	    SPRING_DATASOURCE_URL = credentials('postgres-url')
@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ready-to-Marry/${SERVICE_REPO_NAME}.git'
+                git branch: 'main', url: "https://github.com/Ready-to-Marry/${SERVICE_REPO_NAME}"
             }
         }
         stage('Build Docker Image') {
