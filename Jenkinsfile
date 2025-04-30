@@ -4,7 +4,7 @@ pipeline {
 	    SERVICE_REPO_NAME = 'RTM_UserService'
 	    DOCKER_IMAGE = 'rtm-user-service'
 	    SERVICE_NAME = 'user-service'
-        SPRING_DATASOURCE_URL = credentials('postgres-url')
+	    SPRING_DATASOURCE_URL = credentials('postgres-url')
 	    DB_CREDENTIALS = credentials('postgres-db-credentials')
 	    HELM_REPO_URL = 'https://github.com/Ready-to-Marry/RTM_infra.git'
     }
