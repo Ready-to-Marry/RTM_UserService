@@ -26,6 +26,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+		    echo "DOCKER_USERNAME: ${DOCKER_USERNAME}"
+            	    echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
+            	    echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         docker.withRegistry('', 'dockerhub') {
                             echo "📤 Pushing image to Docker Hub..."
