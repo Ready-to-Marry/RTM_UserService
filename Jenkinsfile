@@ -40,24 +40,25 @@ pipeline {
                 script {
                     echo "🛠️ Cloning Helm chart repo..."
                     sh 'rm -rf rtm-helm'
-                    sh "git clone ${HELM_REPO_URL} rtm-helm"
 
-                    echo "🔧 Updating image tag to ${env.BUILD_NUMBER}..."
-                    sh """
-                      sed -i 's/^  tag: .*/  tag: "${env.BUILD_NUMBER}"/' rtm-helm/${SERVICE_NAME}/values.yaml
-                    """
-
-                    dir('rtm-helm') {
-                        sh 'git config user.name "hyundoo"'
-                        sh 'git config user.email "hyundoo1006@gmail.com"'
-                        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                            sh """
-                            git remote set-url origin https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/Ready-to-Marry/RTM_infra.git
-                            git commit -am 'Update image tag to ${env.BUILD_NUMBER}'
-                            git push origin HEAD:main
-                            """
-                        }
-                    }
+	            withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+	                sh "git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/Ready-to-Marry/RTM_infra.git rtm-helm"
+	
+	                echo "🔧 Updating image tag to ${env.BUILD_NUMBER}..."
+	                sh """
+	                  sed -i 's/^  tag: .*/  tag: "${env.BUILD_NUMBER}"/' rtm-helm/${SERVICE_NAME}/values.yaml
+	                """
+	
+	                dir('rtm-helm') {
+	                    sh 'git config user.name "hyundoo"'
+	                    sh 'git config user.email "hyundoo1006@gmail.com"'
+	                    
+	                    sh """
+	                    git commit -am 'Update image tag to ${env.BUILD_NUMBER}'
+	                    git push origin HEAD:main
+	                    """
+	                }
+	            }
                 }
             }
         }
