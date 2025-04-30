@@ -27,12 +27,9 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-			echo "DOCKER_USERNAME: ${DOCKER_USERNAME}"
-            	    	echo "DOCKER_IMAGE: ${DOCKER_IMAGE}"
-            	    	echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
                         docker.withRegistry('', 'dockerhub') {
                             echo "📤 Pushing image to Docker Hub..."
-                            docker.image("${DOCKER_USERNAME}/${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("hyundooboo/${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
                         }
                     }
                 }
