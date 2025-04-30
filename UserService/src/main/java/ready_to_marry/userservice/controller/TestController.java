@@ -3,10 +3,7 @@ package ready_to_marry.userservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Test;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.entity.user.Users;
 import ready_to_marry.userservice.repository.TestRepository;
 
@@ -16,6 +13,11 @@ import ready_to_marry.userservice.repository.TestRepository;
 public class TestController {
 
     private final TestRepository testRepository;
+
+    @GetMapping("/")
+    public String index() {
+        return "Health Check";
+    }
 
     @PostMapping("/add")
     public ResponseEntity<String> add() {
