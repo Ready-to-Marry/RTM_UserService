@@ -18,7 +18,7 @@ public class TestController {
     private final TestRepository testRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<String> add(@RequestBody Test test) {
+    public ResponseEntity<String> add() {
         Users user = Users.builder()
                 .name("dummy")
                 .build();
