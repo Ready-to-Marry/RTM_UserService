@@ -6,12 +6,13 @@ pipeline {
 	    SERVICE_NAME = 'user-service'
 	    SPRING_DATASOURCE_URL = credentials('postgres-url')
 	    DB_CREDENTIALS = credentials('postgres-db-credentials')
+	    GITHUB_CREDENTIALS = credentials('github-token')
 	    HELM_REPO_URL = 'https://github.com/Ready-to-Marry/RTM_infra.git'
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: "https://github.com/Ready-to-Marry/${SERVICE_REPO_NAME}"
+                git branch: 'main', url: "https://github.com/Ready-to-Marry/${SERVICE_REPO_NAME}", credentialsId: 'github-token'
             }
         }
         stage('Build Docker Image') {
