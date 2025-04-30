@@ -34,6 +34,9 @@ dependencies {
 
     // PostgreSQL JDBC Driver
     implementation 'org.postgresql:postgresql:42.2.5'
+
+    // Spring Boot Actuator (Health Check용)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
