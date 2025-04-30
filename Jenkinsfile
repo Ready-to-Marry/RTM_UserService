@@ -29,7 +29,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         docker.withRegistry('', 'dockerhub') {
                             echo "📤 Pushing image to Docker Hub..."
-                            docker.image("hyundooboo/${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                            docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
                         }
                     }
                 }
