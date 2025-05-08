@@ -16,7 +16,8 @@ public class TestController {
 
     @GetMapping("/")
     public String index() {
-        return "Health Check";
+        System.out.println("호출 완료");
+        return "call good";
     }
 
     @PostMapping("/add")
