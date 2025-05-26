@@ -18,7 +18,7 @@ import ready_to_marry.userservice.profile.service.UserProfileService;
 @RestController
 @RequestMapping("/internal/user-profiles")
 @RequiredArgsConstructor
-public class InternalUserProfileController {
+public class UserProfileInternalController {
     private final UserProfileService userProfileService;
 
     /**
