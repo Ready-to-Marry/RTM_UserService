@@ -41,6 +41,9 @@ dependencies {
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // AWS SDK for S3
+    implementation 'software.amazon.awssdk:s3:2.20.124'
+
     // Service Discovery (Eureka Client)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
