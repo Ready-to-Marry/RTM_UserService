@@ -57,4 +57,23 @@ public final class MaskingUtils {
             return prefix + start + mid + end;
         }
     }
+
+    /**
+     * 유저 도메인 ID 부분 마스킹 (예: 123456 → ****56)
+     * null 또는 음수일 경우 빈 문자열 반환
+     */
+    public static String maskUserId(Long userId) {
+        if (userId == null || userId < 0) return "";
+
+        String str = String.valueOf(userId);
+        int len = str.length();
+
+        // 1~2자리면 전부 마스킹
+        if (len <= 2) {
+            return "*".repeat(len);
+        }
+
+        // 뒤 2자리만 남기고 마스킹
+        return "*".repeat(len - 2) + str.substring(len - 2);
+    }
 }

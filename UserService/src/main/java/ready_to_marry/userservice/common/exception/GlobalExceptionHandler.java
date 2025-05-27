@@ -48,7 +48,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
             ConstraintViolationException.class,
-            MethodArgumentTypeMismatchException.class
+            MethodArgumentTypeMismatchException.class,
+            ValidationException.class
     })
     public ResponseEntity<ApiResponse<Void>> handleValidation(Exception ex) {
         List<ErrorDetail> errors = new ArrayList<>();
@@ -80,6 +81,13 @@ public class GlobalExceptionHandler {
             errors.add(ErrorDetail.builder()
                     .field(field)
                     .reason(msg)
+                    .build());
+        }
+        else if (ex instanceof ValidationException ve) {
+            // 단일 필드 검증 실패
+            errors.add(ErrorDetail.builder()
+                    .field(ve.getField())
+                    .reason(ve.getReason())
                     .build());
         }
 
