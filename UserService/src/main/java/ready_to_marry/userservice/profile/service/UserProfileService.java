@@ -6,6 +6,7 @@ import ready_to_marry.userservice.common.exception.ValidationException;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
+import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
 
 /**
  * 유저 프로필 도메인의 비즈니스 로직을 제공하는 서비스 인터페이스
@@ -41,4 +42,15 @@ public interface UserProfileService {
      * @throws InfrastructureException S3_UPLOAD_FAILURE
      */
     void updateMyProfile(Long userId, ProfileUpdateRequest request);
+
+    /**
+     * 현재 로그인한 유저의 커플 초대 코드 발급
+     * 1) 중복되지 않는 초대코드 생성
+     * 2) Redis에 저장
+     * 3) 응답 반환
+     *
+     * @param userId 초대 코드 발급자(user)의 도메인 ID
+     * @return InviteCodeIssueResponse 발급된 초대 코드 응답 DTO
+     */
+    InviteCodeIssueResponse issueInviteCode(Long userId);
 }

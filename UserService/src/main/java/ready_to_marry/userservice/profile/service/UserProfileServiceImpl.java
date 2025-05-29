@@ -3,6 +3,7 @@ package ready_to_marry.userservice.profile.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import ready_to_marry.userservice.common.util.MaskingUtils;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
+import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
 import ready_to_marry.userservice.profile.entity.UserProfile;
 import ready_to_marry.userservice.profile.repository.UserProfileRepository;
 import ready_to_marry.userservice.profile.util.S3Storage;
@@ -26,6 +28,7 @@ import java.io.IOException;
 public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final S3Storage s3Storage;
+    private final InviteCodeService inviteCodeService;
 
     @Override
     @Transactional
@@ -135,5 +138,36 @@ public class UserProfileServiceImpl implements UserProfileService {
 
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
+    }
+
+    @Override
+    public InviteCodeIssueResponse issueInviteCode(Long userId) {
+        // 1) 중복되지 않는 초대코드 생성
+        String code = null;
+        for (int i = 0; i < 5; i++) {
+            String candidate = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
+            boolean exists = inviteCodeService.getUserIdByInviteCode(candidate).isPresent();
+            if (!exists) {
+                code = candidate;
+                break;
+            }
+        }
+        if (code == null) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.INVITE_CODE_GENERATION_FAILURE, MaskingUtils.maskUserId(userId));
+            throw new InfrastructureException(ErrorCode.INVITE_CODE_GENERATION_FAILURE, null);
+        }
+
+        // 2) Redis에 저장
+        try {
+            inviteCodeService.save(code, userId);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.INVITE_CODE_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.INVITE_CODE_SAVE_FAILURE, ex);
+        }
+
+        // 3) 응답 반환
+        return InviteCodeIssueResponse.builder()
+                .inviteCode(code)
+                .build();
     }
 }
