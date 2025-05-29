@@ -59,7 +59,7 @@ public interface UserProfileService {
     InviteCodeIssueResponse issueInviteCode(Long userId);
 
     /**
-     * 현재 로그인한 유저의 초대 코드 기반으로 커플 연결을 수행
+     * 초대 코드 기반으로 현재 로그인한 유저의 커플 연결 수행
      * 1) 초대 코드로 상대(발급자) userId 조회
      * 2) 자기 자신에게 연결 시도한 경우
      * 3) 유저 프로필 조회 (본인 + 상대방)

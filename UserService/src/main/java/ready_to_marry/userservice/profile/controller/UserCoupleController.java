@@ -38,7 +38,7 @@ public class UserCoupleController {
     }
 
     /**
-     * 초대 코드 기반으로 커플 연결
+     * 초대 코드 기반으로 현재 로그인한 유저의 커플 연결을 수행
      *
      * @param userId   게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
      * @param request  초대 코드가 포함된 유저의 커플 연결 요청 정보
