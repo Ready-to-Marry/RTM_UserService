@@ -12,7 +12,11 @@ public enum ErrorCode {
     DB_SAVE_FAILURE(2101, "System error occurred while saving data to the database"),
     DB_DELETE_FAILURE(2102, "System error occurred while deleting data from the database"),
     DB_RETRIEVE_FAILURE(2103, "System error occurred while retrieving data from the database"),
-    S3_UPLOAD_FAILURE(2104, "System error occurred while uploading image to S3");
+    S3_UPLOAD_FAILURE(2104, "System error occurred while uploading image to S3"),
+    INVITE_CODE_SAVE_FAILURE(2105, "System error occurred while saving invite code to redis"),
+    INVITE_CODE_DELETE_FAILURE(2106, "System error occurred while deleting invite code from redis"),
+    INVITE_CODE_RETRIEVE_FAILURE(2107, "System error occurred while retrieving invite code from redis"),
+    INVITE_CODE_GENERATION_FAILURE(2108, "System error occurred while generating unique invite code after multiple attempts");
 
     private final int code;
     private final String message;
