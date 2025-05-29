@@ -76,4 +76,32 @@ public final class MaskingUtils {
         // 뒤 2자리만 남기고 마스킹
         return "*".repeat(len - 2) + str.substring(len - 2);
     }
+
+    /**
+     * 커플 초대 코드 부분 마스킹
+     * 길이 2 이하: 전체 마스킹
+     * 길이 3~4: 앞/뒤 한 글자만 남기고 마스킹 (A**Z)
+     * 길이 5 이상: 앞 2글자, 뒤 2글자 제외한 가운데 마스킹 (AB***YZ)
+     */
+    public static String maskInviteCode(String inviteCode) {
+        if (inviteCode == null || inviteCode.isBlank()) return "";
+
+        int len = inviteCode.length();
+
+        if (len <= 2) {
+            // 1~2자리면 전부 마스킹
+            return "*".repeat(len);
+        } else if (len <= 4) {
+            // 앞 1, 뒤 1 제외
+            return inviteCode.charAt(0)
+                    + "*".repeat(len - 2)
+                    + inviteCode.charAt(len - 1);
+        } else {
+            // 앞 2, 뒤 2 제외
+            String start = inviteCode.substring(0, 2);
+            String end = inviteCode.substring(len - 2);
+            String midMask = "*".repeat(len - 4);
+            return start + midMask + end;
+        }
+    }
 }

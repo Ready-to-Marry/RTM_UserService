@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 /**
  * user_db.user_profile 테이블 매핑 엔티티
@@ -25,7 +26,7 @@ public class UserProfile {
 
     // 커플 ID
     @Column(name = "couple_id")
-    private Long coupleId;
+    private UUID coupleId;
 
     // 유저 실명(또는 표시명)
     @Column(name = "name", length = 50, nullable = false)
