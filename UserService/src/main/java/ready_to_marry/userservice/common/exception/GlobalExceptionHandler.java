@@ -14,7 +14,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 import ready_to_marry.userservice.common.dto.response.ErrorDetail;
 
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -98,20 +97,6 @@ public class GlobalExceptionHandler {
                 .errors(errors)
                 .build();
         return ResponseEntity.badRequest().body(body);
-    }
-
-    /**
-     * 인가 오류 예외 처리
-     * HTTP 403 + code=403
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
-        ApiResponse<Void> body = ApiResponse.<Void>builder()
-                .code(403)
-                .message("Forbidden")
-                .data(null)
-                .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
     /**

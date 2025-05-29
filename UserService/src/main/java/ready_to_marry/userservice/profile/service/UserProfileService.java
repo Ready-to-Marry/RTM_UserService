@@ -49,8 +49,10 @@ public interface UserProfileService {
      * 2) Redis에 저장
      * 3) 응답 반환
      *
-     * @param userId 초대 코드 발급자(user)의 도메인 ID
+     * @param userId  X-User-Id 헤더에서 전달받은 유저 도메인 ID
      * @return InviteCodeIssueResponse 발급된 초대 코드 응답 DTO
+     * @throws InfrastructureException INVITE_CODE_GENERATION_FAILURE
+     * @throws InfrastructureException INVITE_CODE_SAVE_FAILURE
      */
     InviteCodeIssueResponse issueInviteCode(Long userId);
 }
