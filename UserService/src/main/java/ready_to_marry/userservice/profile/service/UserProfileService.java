@@ -1,8 +1,10 @@
 package ready_to_marry.userservice.profile.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 import ready_to_marry.userservice.common.exception.ValidationException;
+import ready_to_marry.userservice.profile.dto.request.CoupleConnectRequest;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
@@ -55,4 +57,27 @@ public interface UserProfileService {
      * @throws InfrastructureException INVITE_CODE_SAVE_FAILURE
      */
     InviteCodeIssueResponse issueInviteCode(Long userId);
+
+    /**
+     * 현재 로그인한 유저의 초대 코드 기반으로 커플 연결을 수행
+     * 1) 초대 코드로 상대(발급자) userId 조회
+     * 2) 자기 자신에게 연결 시도한 경우
+     * 3) 유저 프로필 조회 (본인 + 상대방)
+     * 4) 이미 커플 상태인지 확인
+     * 5) coupleId 설정 및 저장
+     * 6) 초대 코드 삭제
+     *
+     * @param userId  X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @param request 유저의 커플 연결 요청 DTO (inviteCode)
+     * @throws EntityNotFoundException 본인 또는 상대방의 프로필이 존재하지 않는 경우
+     * @throws BusinessException INVALID_INVITE_CODE
+     * @throws BusinessException CANNOT_CONNECT_TO_SELF
+     * @throws BusinessException ALREADY_CONNECTED_SELF
+     * @throws BusinessException ALREADY_CONNECTED_PARTNER
+     * @throws InfrastructureException DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException DB_SAVE_FAILURE
+     * @throws InfrastructureException INVITE_CODE_RETRIEVE_FAILURE
+     * @throws InfrastructureException INVITE_CODE_DELETE_FAILURE
+     */
+    void connectCouple(Long userId, CoupleConnectRequest request);
 }

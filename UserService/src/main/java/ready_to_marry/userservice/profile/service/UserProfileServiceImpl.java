@@ -8,10 +8,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.ErrorCode;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 import ready_to_marry.userservice.common.exception.ValidationException;
 import ready_to_marry.userservice.common.util.MaskingUtils;
+import ready_to_marry.userservice.profile.dto.request.CoupleConnectRequest;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
@@ -21,6 +23,7 @@ import ready_to_marry.userservice.profile.repository.UserProfileRepository;
 import ready_to_marry.userservice.profile.util.S3Storage;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -169,5 +172,95 @@ public class UserProfileServiceImpl implements UserProfileService {
         return InviteCodeIssueResponse.builder()
                 .inviteCode(code)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void connectCouple(Long userId, CoupleConnectRequest request) {
+        String code = request.getInviteCode();
+
+        // 1) 초대 코드로 상대(발급자) userId 조회
+        Long targetUserId;
+        try {
+            targetUserId = inviteCodeService.getUserIdByInviteCode(code)
+                    .orElseThrow(() -> {
+                        log.error("{}: identifierType=inviteCode, identifierValue={}", ErrorCode.INVALID_INVITE_CODE.getMessage(), MaskingUtils.maskInviteCode(code));
+                        return new BusinessException(ErrorCode.INVALID_INVITE_CODE);
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=inviteCode, identifierValue={}", ErrorCode.INVITE_CODE_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskInviteCode(code), ex);
+            throw new InfrastructureException(ErrorCode.INVITE_CODE_RETRIEVE_FAILURE, ex);
+        }
+
+        // 2) 자기 자신에게 연결 시도한 경우
+        if (userId.equals(targetUserId)) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.CANNOT_CONNECT_TO_SELF.getMessage(), MaskingUtils.maskUserId(userId));
+            throw new BusinessException(ErrorCode.CANNOT_CONNECT_TO_SELF);
+        }
+
+        // 3) 유저 프로필 조회 (본인 + 상대방)
+        UserProfile me;
+        UserProfile partner;
+
+        try {
+            me = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("User profile not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("User profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        try {
+            partner = userProfileRepository.findById(targetUserId)
+                    .orElseThrow(() -> {
+                        log.error("Target user profile not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(targetUserId));
+                        return new EntityNotFoundException("Target user profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(targetUserId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 4) 이미 커플 상태인지 확인
+        if (me.getCoupleId() != null) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.ALREADY_CONNECTED_SELF.getMessage(), MaskingUtils.maskUserId(userId));
+            throw new BusinessException(ErrorCode.ALREADY_CONNECTED_SELF);
+        }
+
+        if (partner.getCoupleId() != null) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.ALREADY_CONNECTED_PARTNER.getMessage(), MaskingUtils.maskUserId(targetUserId));
+            throw new BusinessException(ErrorCode.ALREADY_CONNECTED_PARTNER);
+        }
+
+        // 5) coupleId 설정 및 저장
+        UUID coupleId = UUID.randomUUID();
+
+        me.setCoupleId(coupleId);
+        partner.setCoupleId(coupleId);
+
+        try {
+            userProfileRepository.save(me);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+
+        try {
+            userProfileRepository.save(partner);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(targetUserId), ex);
+            throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+
+        // 6) 초대 코드 삭제
+        try {
+            inviteCodeService.delete(code);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=inviteCode, identifierValue={}", ErrorCode.INVITE_CODE_DELETE_FAILURE.getMessage(), MaskingUtils.maskInviteCode(code), ex);
+            throw new InfrastructureException(ErrorCode.INVITE_CODE_DELETE_FAILURE, ex);
+        }
     }
 }
