@@ -263,4 +263,62 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InfrastructureException(ErrorCode.INVITE_CODE_DELETE_FAILURE, ex);
         }
     }
+
+    @Override
+    @Transactional
+    public void releaseCouple(Long userId) {
+        // 1) userId로 현재 로그인한 유저의 UserProfile 조회
+        UserProfile me;
+        try {
+            me = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("User profile not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("User profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 2) 본인이 커플 상태(coupleId 존재)인지 확인
+        UUID coupleId = me.getCoupleId();
+        if (coupleId == null) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.ALREADY_RELEASED.getMessage(), MaskingUtils.maskUserId(userId));
+            throw new BusinessException(ErrorCode.ALREADY_RELEASED);
+        }
+
+        // 3) 상대방 프로필 조회 (같은 coupleId를 가진 프로필 중 본인이 아닌 상대)
+        UserProfile partner;
+        try {
+            partner = userProfileRepository.findByCoupleId(coupleId).stream()
+                    .filter(profile -> !profile.getUserId().equals(userId))
+                    .findFirst()
+                    .orElseThrow(() -> {
+                        log.error("Target user profile not found: identifierType=coupleId, identifierValue={}", MaskingUtils.maskCoupleId(coupleId));
+                        return new EntityNotFoundException("Target user profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 4) 본인과 상대방의 coupleId를 null로 설정하여 커플 해제
+        me.setCoupleId(null);
+        partner.setCoupleId(null);
+
+        // 5) 두 프로필 모두 저장
+        try {
+            userProfileRepository.save(me);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+
+        try {
+            userProfileRepository.save(partner);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(partner.getUserId()), ex);
+            throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+    }
 }

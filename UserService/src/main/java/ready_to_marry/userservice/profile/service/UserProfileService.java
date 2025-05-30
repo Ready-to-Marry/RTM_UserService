@@ -80,4 +80,20 @@ public interface UserProfileService {
      * @throws InfrastructureException      INVITE_CODE_DELETE_FAILURE
      */
     void connectCouple(Long userId, CoupleConnectRequest request);
+
+    /**
+     *현재 로그인한 유저의 커플 연결 해제
+     * 1) userId로 현재 로그인한 유저의 UserProfile 조회
+     * 2) 본인이 커플 상태(coupleId 존재)인지 확인
+     * 3) 상대방 프로필 조회 (같은 coupleId를 가진 프로필 중 본인이 아닌 상대)
+     * 4) 본인과 상대방의 coupleId를 null로 설정하여 커플 해제
+     * 5) 두 프로필 모두 저장
+     *
+     * @param userId                        X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @throws EntityNotFoundException      본인 또는 상대방의 프로필이 존재하지 않는 경우
+     * @throws BusinessException            ALREADY_RELEASED
+     * @throws InfrastructureException      DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException      DB_SAVE_FAILURE
+     */
+    void releaseCouple(Long userId);
 }

@@ -56,4 +56,23 @@ public class UserCoupleController {
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 현재 로그인한 유저의 커플 연결을 해제
+     *
+     * @param userId   게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
+     * @return 성공 시 code=0, data=null
+     */
+    @PostMapping("/couple-connection/release")
+    public ResponseEntity<ApiResponse<Void>> releaseCouple(@RequestHeader("X-User-Id") Long userId) {
+        userProfileService.releaseCouple(userId);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(0)
+                .message("Couple released successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }
