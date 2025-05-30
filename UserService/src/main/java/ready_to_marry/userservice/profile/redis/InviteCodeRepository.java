@@ -20,7 +20,7 @@ public interface InviteCodeRepository {
      * 초대 코드로 발급자(userId) 조회
      *
      * @param code      초대 코드
-     * @return          유저 도메인 ID (없으면 Optional.empty())
+     * @return 유저 도메인 ID (없으면 Optional.empty())
      */
     Optional<Long> findUserIdByCode(String code);
 
