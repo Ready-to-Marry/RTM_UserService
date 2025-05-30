@@ -1,5 +1,7 @@
 package ready_to_marry.userservice.common.util;
 
+import java.util.UUID;
+
 public final class MaskingUtils {
     private MaskingUtils() {
         // 유틸 클래스이므로 인스턴스 생성 방지
@@ -103,5 +105,23 @@ public final class MaskingUtils {
             String midMask = "*".repeat(len - 4);
             return start + midMask + end;
         }
+    }
+
+    /**
+     * 커플 ID 부분 마스킹
+     *
+     * 예: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d → 1a2b...5c6d
+     */
+    public static String maskCoupleId(UUID coupleId) {
+        if (coupleId == null) return "";
+
+        String id = coupleId.toString().replace("-", "");
+        int len = id.length();
+
+        if (len <= 8) {
+            return "*".repeat(len);
+        }
+
+        return id.substring(0, 4) + "..." + id.substring(id.length() - 4);
     }
 }

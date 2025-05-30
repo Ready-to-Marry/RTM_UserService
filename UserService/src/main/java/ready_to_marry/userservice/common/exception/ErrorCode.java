@@ -11,6 +11,7 @@ public enum ErrorCode {
     CANNOT_CONNECT_TO_SELF(1102, "Cannot connect couple to self"),
     ALREADY_CONNECTED_SELF(1103, "Current user is already connected"),
     ALREADY_CONNECTED_PARTNER(1104, "Target user is already connected"),
+    ALREADY_RELEASED(1105, "Couple already released or not connected"),
 
     // 2xxx: 인프라(시스템) 오류
     DB_SAVE_FAILURE(2101, "System error occurred while saving data to the database"),
