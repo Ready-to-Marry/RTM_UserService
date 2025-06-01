@@ -18,6 +18,7 @@ import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateReque
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
+import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 import ready_to_marry.userservice.profile.entity.UserProfile;
 import ready_to_marry.userservice.profile.repository.UserProfileRepository;
 import ready_to_marry.userservice.profile.util.S3Storage;
@@ -54,6 +55,31 @@ public class UserProfileServiceImpl implements UserProfileService {
         // 3) 생성된 userId를 포함한 응답 DTO 반환
         return InternalProfileCreateResponse.builder()
                 .userId(savedUserProfile.getUserId())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserProfileResponse getMyProfile(Long userId) {
+        // 1) 유저 프로필 조회
+        UserProfile profile;
+        try {
+            profile = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("User profile not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("User profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 2) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부를 포함한 응답 DTO 반환
+        return UserProfileResponse.builder()
+                .name(profile.getName())
+                .phone(profile.getPhone())
+                .profileImgUrl(profile.getProfileImgUrl())
+                .connectedCouple(profile.getCoupleId() != null)
                 .build();
     }
 

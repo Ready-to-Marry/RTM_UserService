@@ -9,6 +9,7 @@ import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateReque
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
 import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
+import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 
 /**
  * 유저 프로필 도메인의 비즈니스 로직을 제공하는 서비스 인터페이스
@@ -25,6 +26,19 @@ public interface UserProfileService {
      * @throws InfrastructureException          DB_SAVE_FAILURE
      */
     InternalProfileCreateResponse createInternalProfile(InternalProfileCreateRequest request);
+
+    /**
+     * 로그인한 유저의 프로필 정보 조회
+     * 1) 유저 프로필 조회
+     * 2) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부를 포함한 응답 DTO 반환
+     *
+     * @param userId                        X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @return UserProfileResponse          프로필 조회 결과 응답 DTO (유저 프로필 정보 및 커플 연결 여부 포함)
+     * @throws EntityNotFoundException      유저 프로필이 존재하지 않는 경우
+     * @throws InfrastructureException      DB_RETRIEVE_FAILURE
+     */
+    UserProfileResponse getMyProfile(Long userId);
+
 
     /**
      * 현재 로그인한 유저의 프로필(name, phone, profileImage)을 수정
