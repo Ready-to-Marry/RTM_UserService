@@ -9,7 +9,7 @@ import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 import ready_to_marry.userservice.profile.service.UserProfileService;
 
 /**
- * 유저의 프로필 수정을 처리하는 컨트롤러
+ * 유저의 프로필 수정, 조회를 처리하는 컨트롤러
  */
 @RestController
 @RequestMapping("/users/me/profiles")
