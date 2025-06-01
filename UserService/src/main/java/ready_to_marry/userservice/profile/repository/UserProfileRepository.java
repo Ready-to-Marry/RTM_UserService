@@ -16,7 +16,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
      * 커플 ID로 유저 프로필 리스트 조회
      *
      * @param coupleId 유저의 커플 ID
-     * @return Optional.empty()이면 미존재
+     * @return 커플 ID에 해당하는 UserProfile 객체 리스트 (없을 경우 빈 리스트 반환)
      */
     List<UserProfile> findByCoupleId(UUID coupleId);
 }
