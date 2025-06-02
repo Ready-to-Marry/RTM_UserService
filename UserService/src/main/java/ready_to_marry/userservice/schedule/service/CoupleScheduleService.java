@@ -3,6 +3,7 @@ package ready_to_marry.userservice.schedule.service;
 import jakarta.persistence.EntityNotFoundException;
 import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
+import ready_to_marry.userservice.schedule.dto.request.ScheduleCreateRequest;
 import ready_to_marry.userservice.schedule.dto.response.CoupleScheduleSummaryResponse;
 
 import java.time.YearMonth;
@@ -26,4 +27,19 @@ public interface CoupleScheduleService {
      * @throws InfrastructureException              DB_RETRIEVE_FAILURE
      */
     List<CoupleScheduleSummaryResponse> getMonthlyScheduleSummary(Long userId, YearMonth yearMonth);
+
+    /**
+     * 유저 ID 기준으로 해당 커플의 일정 등록
+     * 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+     * 2) CoupleSchedule 엔티티 생성
+     * 3) 저장
+     *
+     * @param userId                               X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @param request                              유저의 커플 일정 등록 요청 DTO
+     * @throws EntityNotFoundException             본인의 프로필이 존재하지 않는 경우
+     * @throws BusinessException                   COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException             DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException             DB_SAVE_FAILURE
+     */
+    void createSchedule(Long userId, ScheduleCreateRequest request);
 }
