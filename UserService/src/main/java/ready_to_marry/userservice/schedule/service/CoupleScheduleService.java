@@ -63,11 +63,29 @@ public interface CoupleScheduleService {
      * @param request                              유저의 커플 일정 수정 요청 DTO
      * @throws EntityNotFoundException             본인의 프로필이 존재하지 않는 경우
      * @throws EntityNotFoundException             해당 scheduleId의 커플 일정이 존재하지 않는 경우
-     * @throws ForbiddenException                  해당 일정이 요청한 유저의 커플 일정이 아닌 경우
+     * @throws ForbiddenException                  FORBIDDEN (해당 일정이 요청한 유저의 커플 일정이 아닌 경우)
      * @throws ValidationException                 title, content 검증에서 적절하지 값이 들어온 경우
      * @throws BusinessException                   COUPLE_NOT_CONNECTED
      * @throws InfrastructureException             DB_RETRIEVE_FAILURE
      * @throws InfrastructureException             DB_SAVE_FAILURE
      */
     void updateSchedule(Long userId, Long scheduleId, ScheduleUpdateRequest request);
+
+    /**
+     * 일정 ID 기준으로 특정 커플이 등록한 일정 삭제
+     * 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+     * 2) 해당 일정 ID의 일정이 존재하는지 검증
+     * 3) 해당 일정이 요청한 유저의 커플에 속해있는지 검증
+     * 4) 삭제
+     *
+     * @param userId                                요청 유저의 도메인 ID
+     * @param scheduleId                            삭제할 일정 ID
+     * @throws EntityNotFoundException              본인의 프로필이 존재하지 않는 경우
+     * @throws EntityNotFoundException              해당 scheduleId의 커플 일정이 존재하지 않는 경우
+     * @throws ForbiddenException                   FORBIDDEN (해당 일정이 요청한 유저의 커플 일정이 아닌 경우)
+     * @throws BusinessException                    COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException              DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException              DB_DELETE_FAILURE
+     */
+    void deleteSchedule(Long userId, Long scheduleId);
 }

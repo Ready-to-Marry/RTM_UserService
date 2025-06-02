@@ -146,4 +146,38 @@ public class CoupleScheduleServiceImpl implements CoupleScheduleService {
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteSchedule(Long userId, Long scheduleId) {
+        // 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+        UUID coupleId = userProfileService.getCoupleIdOrThrow(userId);
+
+        // 2) 해당 일정 ID의 일정이 존재하는지 검증
+        CoupleSchedule schedule;
+        try {
+            schedule = coupleScheduleRepository.findById(scheduleId)
+                    .orElseThrow(() -> {
+                        log.error("Couple schedule not found: identifierType=scheduleId, identifierValue={}", scheduleId);
+                        return new EntityNotFoundException("Couple schedule not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=scheduleId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), scheduleId, ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 3) 해당 일정이 요청한 유저의 커플에 속해있는지 검증
+        if (!schedule.getCoupleId().equals(coupleId)) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.FORBIDDEN.getMessage(), MaskingUtils.maskCoupleId(coupleId));
+            throw new ForbiddenException(ErrorCode.FORBIDDEN);
+        }
+
+        // 4) 삭제
+        try {
+            coupleScheduleRepository.delete(schedule);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=scheduleId, identifierValue={}", ErrorCode.DB_DELETE_FAILURE.getMessage(), scheduleId, ex);
+            throw new InfrastructureException(ErrorCode.DB_DELETE_FAILURE, ex);
+        }
+    }
 }

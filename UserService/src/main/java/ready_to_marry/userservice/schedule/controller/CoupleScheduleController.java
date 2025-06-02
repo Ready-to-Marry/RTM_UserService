@@ -74,4 +74,20 @@ public class CoupleScheduleController {
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 커플 일정 삭제
+     */
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<ApiResponse<Void>> deleteSchedule(@RequestHeader("X-User-Id") Long userId, @PathVariable Long scheduleId) {
+        coupleScheduleService.deleteSchedule(userId, scheduleId);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(0)
+                .message("Schedule deleted successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }
