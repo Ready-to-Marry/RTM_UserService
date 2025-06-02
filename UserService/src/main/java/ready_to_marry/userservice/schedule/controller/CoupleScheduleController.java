@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 import ready_to_marry.userservice.schedule.dto.request.ScheduleCreateRequest;
+import ready_to_marry.userservice.schedule.dto.request.ScheduleUpdateRequest;
 import ready_to_marry.userservice.schedule.dto.response.CoupleScheduleSummaryResponse;
 import ready_to_marry.userservice.schedule.service.CoupleScheduleService;
 
@@ -52,6 +53,22 @@ public class CoupleScheduleController {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(0)
                 .message("Schedule created successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 커플 일정 수정
+     */
+    @PatchMapping("/{scheduleId}")
+    public ResponseEntity<ApiResponse<Void>> updateSchedule(@RequestHeader("X-User-Id") Long userId, @PathVariable("scheduleId") Long scheduleId, @RequestBody ScheduleUpdateRequest request) {
+        coupleScheduleService.updateSchedule(userId, scheduleId, request);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(0)
+                .message("Schedule updated successfully")
                 .data(null)
                 .build();
 
