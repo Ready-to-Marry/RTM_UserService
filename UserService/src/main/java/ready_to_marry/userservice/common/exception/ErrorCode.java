@@ -22,7 +22,10 @@ public enum ErrorCode {
     INVITE_CODE_SAVE_FAILURE(2105, "System error occurred while saving invite code to redis"),
     INVITE_CODE_DELETE_FAILURE(2106, "System error occurred while deleting invite code from redis"),
     INVITE_CODE_RETRIEVE_FAILURE(2107, "System error occurred while retrieving invite code from redis"),
-    INVITE_CODE_GENERATION_FAILURE(2108, "System error occurred while generating unique invite code after multiple attempts");
+    INVITE_CODE_GENERATION_FAILURE(2108, "System error occurred while generating unique invite code after multiple attempts"),
+
+    // 3xxx: 보안 및 인가 오류
+    FORBIDDEN(3101, "You do not have permission to access this resource");
 
     private final int code;
     private final String message;
