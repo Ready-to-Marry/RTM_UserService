@@ -11,6 +11,8 @@ import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResp
 import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
 import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 
+import java.util.UUID;
+
 /**
  * 유저 프로필 도메인의 비즈니스 로직을 제공하는 서비스 인터페이스
  */
@@ -110,4 +112,17 @@ public interface UserProfileService {
      * @throws InfrastructureException      DB_SAVE_FAILURE
      */
     void releaseCouple(Long userId);
+
+    /**
+     * 현재 로그인한 유저의 커플 ID 조회
+     * 1) 유저 프로필 조회
+     * 2) 커플 ID 여부 확인
+     *
+     * @param userId                   X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @return UUID                    해당 유저의 커플 ID
+     * @throws EntityNotFoundException 본인의 프로필이 존재하지 않는 경우
+     * @throws BusinessException       COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException DB_RETRIEVE_FAILURE
+     */
+    UUID getCoupleIdOrThrow(Long userId);
 }

@@ -347,4 +347,30 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UUID getCoupleIdOrThrow(Long userId) {
+        // 1) 유저 프로필 조회
+        UserProfile profile;
+        try {
+            profile = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("User profile not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("User profile not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 2) 커플 ID 여부 확인
+        UUID coupleId = profile.getCoupleId();
+        if (coupleId == null) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.COUPLE_NOT_CONNECTED.getMessage(), MaskingUtils.maskUserId(userId));
+            throw new BusinessException(ErrorCode.COUPLE_NOT_CONNECTED);
+        }
+
+        return coupleId;
+    }
 }

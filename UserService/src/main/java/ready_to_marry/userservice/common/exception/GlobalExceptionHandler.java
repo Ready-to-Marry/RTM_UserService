@@ -100,6 +100,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 보안 및 인가 오류 예외 처리
+     * HTTP 403 + code>0
+     * code = (3100~3199)
+     */
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleForbidden(ForbiddenException ex) {
+        ApiResponse<Void> body = ApiResponse.<Void>builder()
+                .code(ex.getCode())
+                .message(ex.getMessage())
+                .data(null)
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    /**
      * 리소스 없음 오류 예외 처리
      * HTTP 404 + code=404
      */
