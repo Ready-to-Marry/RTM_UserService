@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 import ready_to_marry.userservice.schedule.dto.request.ScheduleCreateRequest;
 import ready_to_marry.userservice.schedule.dto.request.ScheduleUpdateRequest;
+import ready_to_marry.userservice.schedule.dto.response.CoupleScheduleDetailResponse;
 import ready_to_marry.userservice.schedule.dto.response.CoupleScheduleSummaryResponse;
 import ready_to_marry.userservice.schedule.service.CoupleScheduleService;
 
@@ -86,6 +87,22 @@ public class CoupleScheduleController {
                 .code(0)
                 .message("Schedule deleted successfully")
                 .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 커플 일정 상세 조회
+     */
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<ApiResponse<CoupleScheduleDetailResponse>> getScheduleDetail(@RequestHeader("X-User-Id") Long userId, @PathVariable Long scheduleId) {
+        CoupleScheduleDetailResponse detail = coupleScheduleService.getScheduleDetail(userId, scheduleId);
+
+        ApiResponse<CoupleScheduleDetailResponse> response = ApiResponse.<CoupleScheduleDetailResponse>builder()
+                .code(0)
+                .message("Schedule detail retrieved successfully")
+                .data(detail)
                 .build();
 
         return ResponseEntity.ok(response);
