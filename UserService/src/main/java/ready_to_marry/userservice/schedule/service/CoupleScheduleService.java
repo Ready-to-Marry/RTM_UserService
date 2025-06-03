@@ -78,7 +78,7 @@ public interface CoupleScheduleService {
      * 3) 해당 일정이 요청한 유저의 커플에 속해있는지 검증
      * 4) 삭제
      *
-     * @param userId                                요청 유저의 도메인 ID
+     * @param userId                                X-User-Id 헤더에서 전달받은 유저 도메인 ID
      * @param scheduleId                            삭제할 일정 ID
      * @throws EntityNotFoundException              본인의 프로필이 존재하지 않는 경우
      * @throws EntityNotFoundException              해당 scheduleId의 커플 일정이 존재하지 않는 경우
