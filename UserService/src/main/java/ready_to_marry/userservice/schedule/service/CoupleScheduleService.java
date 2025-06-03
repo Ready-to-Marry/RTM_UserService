@@ -101,6 +101,8 @@ public interface CoupleScheduleService {
      * @param scheduleId                            조회할 일정 ID
      * @return CoupleScheduleDetailResponse         커플 일정 상세 정보
      * @throws EntityNotFoundException              본인의 프로필이 존재하지 않는 경우
+     * @throws EntityNotFoundException              해당 scheduleId의 커플 일정이 존재하지 않는 경우
+     * @throws ForbiddenException                   FORBIDDEN (해당 일정이 요청한 유저의 커플 일정이 아닌 경우)
      * @throws BusinessException                    COUPLE_NOT_CONNECTED
      * @throws InfrastructureException              DB_RETRIEVE_FAILURE
      */
