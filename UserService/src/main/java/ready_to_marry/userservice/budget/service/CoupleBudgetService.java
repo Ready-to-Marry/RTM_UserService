@@ -124,11 +124,12 @@ public interface CoupleBudgetService {
      * 2) 해당 커플의 지출 요약 내역 조회
      * 3) 조회된 커플 지출 요약 내역을 응답 DTO로 매핑하여 반환
      *
-     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
-     * @throws EntityNotFoundException  본인의 프로필이 존재하지 않는 경우
-     * @throws EntityNotFoundException  해당 coupleId의 커플 지출 요약 내역이 존재하지 않는 경우
-     * @throws BusinessException        COUPLE_NOT_CONNECTED
-     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     * @param userId                        X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @return CoupleBudgetSummaryResponse  커플 지출 요약 내역 조회 결과 응답 DTO
+     * @throws EntityNotFoundException      본인의 프로필이 존재하지 않는 경우
+     * @throws EntityNotFoundException      해당 coupleId의 커플 지출 요약 내역이 존재하지 않는 경우
+     * @throws BusinessException            COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException      DB_RETRIEVE_FAILURE
      */
     CoupleBudgetSummaryResponse getBudgetSummary(Long userId);
 }
