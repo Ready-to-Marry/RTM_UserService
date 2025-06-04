@@ -1,5 +1,6 @@
 package ready_to_marry.userservice.budget.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +15,7 @@ import ready_to_marry.userservice.budget.repository.CoupleBudgetDetailRepository
 import ready_to_marry.userservice.budget.repository.CoupleBudgetSummaryRepository;
 import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.ErrorCode;
+import ready_to_marry.userservice.common.exception.ForbiddenException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 import ready_to_marry.userservice.common.util.MaskingUtils;
 import ready_to_marry.userservice.profile.service.UserProfileService;
@@ -151,6 +153,82 @@ public class CoupleBudgetServiceImpl implements CoupleBudgetService {
         }
 
         // 5) 지출 요약 내역 저장
+        try {
+            coupleBudgetSummaryRepository.save(summary);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
+            throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteBudgetDetail(Long userId, Long budgetDetailId) {
+        // 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+        UUID coupleId = userProfileService.getCoupleIdOrThrow(userId);
+
+        // 2) 해당 지출 내역 ID의 지출 내역이 존재하는지 검증
+        CoupleBudgetDetail detail;
+        try {
+            detail = coupleBudgetDetailRepository.findById(budgetDetailId)
+                    .orElseThrow(() -> {
+                        log.error("Couple budget detail not found: identifierType=budgetDetailId, identifierValue={}", budgetDetailId);
+                        return new EntityNotFoundException("Couple budget detail not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=budgetDetailId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), budgetDetailId, ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 3) 해당 지출 내역이 요청한 유저의 커플에 속해있는지 검증
+        if (!detail.getCoupleId().equals(coupleId)) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.FORBIDDEN.getMessage(), MaskingUtils.maskCoupleId(coupleId));
+            throw new ForbiddenException(ErrorCode.FORBIDDEN);
+        }
+
+        // 4) 삭제할 지출 내역의 정보 가져오기
+        Long spent = detail.getSpentAmount();
+        BudgetCategory category = detail.getCategory();
+
+        // 5) 지출 내역 삭제
+        try {
+            coupleBudgetDetailRepository.delete(detail);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=budgetDetailId, identifierValue={}", ErrorCode.DB_DELETE_FAILURE.getMessage(), budgetDetailId, ex);
+            throw new InfrastructureException(ErrorCode.DB_DELETE_FAILURE, ex);
+        }
+
+        // 6) 커플 지출 요약 내역 갱신
+        CoupleBudgetSummary summary;
+        try {
+            summary = coupleBudgetSummaryRepository.findByCoupleId(coupleId)
+                    .orElseThrow(() -> {
+                        log.error("Couple budget summary not found: identifierType=coupleId, identifierValue={}", MaskingUtils.maskCoupleId(coupleId));
+                        return new EntityNotFoundException("Couple budget summary not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 총 지출 금액 갱신
+        summary.setTotalSpent(summary.getTotalSpent() - spent);
+
+        // 총 예산이 있는 경우 남은 예산 갱신
+        if (summary.getTotalBudget() != null) {
+            summary.setRemainingBudget(summary.getTotalBudget() - summary.getTotalSpent());
+        }
+
+        // 카테고리별 총 지출 금액 갱신
+        switch (category) {
+            case HALL -> summary.setHallSpent(summary.getHallSpent() - spent);
+            case SDM -> summary.setSdmSpent(summary.getSdmSpent() - spent);
+            case CEREMONY -> summary.setCeremonySpent(summary.getCeremonySpent() - spent);
+            case SUPPLIES -> summary.setSuppliesSpent(summary.getSuppliesSpent() - spent);
+            case ETC -> summary.setEtcSpent(summary.getEtcSpent() - spent);
+        }
+
+        // 7) 지출 요약 내역 저장
         try {
             coupleBudgetSummaryRepository.save(summary);
         } catch (DataAccessException ex) {

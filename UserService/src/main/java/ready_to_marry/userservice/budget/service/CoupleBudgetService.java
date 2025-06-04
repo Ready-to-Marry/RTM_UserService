@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.common.exception.BusinessException;
+import ready_to_marry.userservice.common.exception.ForbiddenException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 
 /**
@@ -50,4 +51,27 @@ public interface CoupleBudgetService {
      * @throws InfrastructureException  DB_SAVE_FAILURE
      */
     void createBudgetDetail(Long userId, BudgetDetailCreateRequest request);
+
+    /**
+     * 지출 내역 ID 기준으로 특정 커플이 등록한 지출 내역 삭제
+     * 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+     * 2) 해당 지출 내역 ID의 지출 내역이 존재하는지 검증
+     * 3) 해당 지출 내역이 요청한 유저의 커플에 속해있는지 검증
+     * 4) 삭제할 지출 내역의 정보 가져오기
+     * 5) 지출 내역 삭제
+     * 6) 커플 지출 요약 내역 갱신
+     * 7) 지출 요약 내역 저장
+     *
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @param budgetDetailId            삭제할 지출 내역 ID
+     * @throws EntityNotFoundException  본인의 프로필이 존재하지 않는 경우
+     * @throws EntityNotFoundException  해당 budgetDetailId의 커플 지출 내역이 존재하지 않는 경우
+     * @throws EntityNotFoundException  해당 coupleId의 커플 지출 요약 내역이 존재하지 않는 경우
+     * @throws ForbiddenException       FORBIDDEN (해당 지출 내역이 요청한 유저의 커플 지출 내역이 아닌 경우)
+     * @throws BusinessException        COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException  DB_DELETE_FAILURE
+     * @throws InfrastructureException  DB_SAVE_FAILURE
+     */
+    void deleteBudgetDetail(Long userId, Long budgetDetailId);
 }
