@@ -1,10 +1,13 @@
 package ready_to_marry.userservice.budget.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetDetailResponse;
 import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
+import ready_to_marry.userservice.common.dto.request.PagingRequest;
 import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.ForbiddenException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
@@ -132,4 +135,20 @@ public interface CoupleBudgetService {
      * @throws InfrastructureException      DB_RETRIEVE_FAILURE
      */
     CoupleBudgetSummaryResponse getBudgetSummary(Long userId);
+
+    /**
+     * 유저 ID 기준으로 해당 커플의 지출 내역을 지출 날짜 기준으로 내림차순 페이징 조회
+     * 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+     * 2) 페이징 요청 정보 생성
+     * 3) 커플 지출 내역을 지출 날짜 기준으로 내림차순 정렬하여 조회 (Projection 기반)
+     * 4) 조회된 Projection 데이터를 DTO로 매핑하여 반환
+     *
+     * @param userId                            현재 로그인한 유저의 ID
+     * @param pagingRequest                     페이징 요청 정보 (page, size)
+     * @return Page<CoupleBudgetDetailResponse> 커플 지출 내역 페이징 결과
+     * @throws EntityNotFoundException          본인의 프로필이 존재하지 않는 경우
+     * @throws BusinessException                COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException          DB_RETRIEVE_FAILURE
+     */
+    Page<CoupleBudgetDetailResponse> getBudgetDetailList(Long userId, PagingRequest pagingRequest);
 }

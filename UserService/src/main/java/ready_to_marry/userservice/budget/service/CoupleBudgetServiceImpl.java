@@ -4,17 +4,22 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetDetailResponse;
 import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
 import ready_to_marry.userservice.budget.entity.CoupleBudgetDetail;
 import ready_to_marry.userservice.budget.entity.CoupleBudgetSummary;
 import ready_to_marry.userservice.budget.enums.BudgetCategory;
 import ready_to_marry.userservice.budget.repository.CoupleBudgetDetailRepository;
 import ready_to_marry.userservice.budget.repository.CoupleBudgetSummaryRepository;
+import ready_to_marry.userservice.budget.repository.projection.CoupleBudgetDetailProjection;
+import ready_to_marry.userservice.common.dto.request.PagingRequest;
 import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.ErrorCode;
 import ready_to_marry.userservice.common.exception.ForbiddenException;
@@ -353,5 +358,34 @@ public class CoupleBudgetServiceImpl implements CoupleBudgetService {
                 .suppliesSpent(summary.getSuppliesSpent())
                 .etcSpent(summary.getEtcSpent())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CoupleBudgetDetailResponse> getBudgetDetailList(Long userId, PagingRequest pagingRequest) {
+        // 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+        UUID coupleId = userProfileService.getCoupleIdOrThrow(userId);
+
+        // 2) 페이징 요청 정보 생성
+        PageRequest pageRequest = PageRequest.of(pagingRequest.getPage(), pagingRequest.getSize());
+
+        // 3) 커플 지출 내역을 지출 날짜 기준으로 내림차순 정렬하여 조회 (Projection 기반)
+        Page<CoupleBudgetDetailProjection> page;
+        try {
+            page = coupleBudgetDetailRepository.findByCoupleIdOrderByDateDesc(coupleId, pageRequest);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 4) 조회된 Projection 데이터를 DTO로 매핑하여 반환
+        return page.map(proj -> CoupleBudgetDetailResponse.builder()
+                .budgetDetailId(proj.getBudgetDetailId())
+                .category(proj.getCategory())
+                .spentAmount(proj.getSpentAmount())
+                .date(proj.getDate())
+                .content(proj.getContent())
+                .build()
+        );
     }
 }

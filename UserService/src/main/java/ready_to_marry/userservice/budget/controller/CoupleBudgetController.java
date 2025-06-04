@@ -2,14 +2,20 @@ package ready_to_marry.userservice.budget.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetDetailResponse;
 import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
 import ready_to_marry.userservice.budget.service.CoupleBudgetService;
+import ready_to_marry.userservice.common.dto.request.PagingRequest;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
+import ready_to_marry.userservice.common.dto.response.Meta;
+
+import java.util.List;
 
 /**
  * 유저의 커플 지출 관련 기능을 처리하는 컨트롤러
@@ -133,6 +139,32 @@ public class CoupleBudgetController {
                 .code(0)
                 .message("Couple budget summary retrieved successfully")
                 .data(budgetSummary)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 커플 지출 내역을 지출 날짜 기준으로 내림차순 페이징 조회
+     *
+     * @param userId        게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
+     * @param pagingRequest 페이징 요청 정보 (page, size)
+     * @return 성공 시 code=0, data=커플 지출 내역 페이징 결과 정보
+     */
+    @GetMapping("/details")
+    public ResponseEntity<ApiResponse<List<CoupleBudgetDetailResponse>>> getBudgetDetailList(@RequestHeader("X-User-Id") Long userId, @ModelAttribute PagingRequest pagingRequest) {
+        Page<CoupleBudgetDetailResponse> page = coupleBudgetService.getBudgetDetailList(userId, pagingRequest);
+
+        ApiResponse<List<CoupleBudgetDetailResponse>> response = ApiResponse.<List<CoupleBudgetDetailResponse>>builder()
+                .code(0)
+                .message("Budget detail list retrieved successfully")
+                .data(page.getContent())
+                .meta(Meta.builder()
+                        .page(page.getNumber())
+                        .size(page.getSize())
+                        .totalElements(page.getTotalElements())
+                        .totalPages(page.getTotalPages())
+                        .build())
                 .build();
 
         return ResponseEntity.ok(response);
