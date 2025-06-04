@@ -152,7 +152,7 @@ public class CoupleBudgetController {
      * @return 성공 시 code=0, data=커플 지출 내역 페이징 결과 정보
      */
     @GetMapping("/details")
-    public ResponseEntity<ApiResponse<List<CoupleBudgetDetailResponse>>> getBudgetDetailList(@RequestHeader("X-User-Id") Long userId, @ModelAttribute PagingRequest pagingRequest) {
+    public ResponseEntity<ApiResponse<List<CoupleBudgetDetailResponse>>> getBudgetDetailList(@RequestHeader("X-User-Id") Long userId, @Valid @ModelAttribute PagingRequest pagingRequest) {
         Page<CoupleBudgetDetailResponse> page = coupleBudgetService.getBudgetDetailList(userId, pagingRequest);
 
         ApiResponse<List<CoupleBudgetDetailResponse>> response = ApiResponse.<List<CoupleBudgetDetailResponse>>builder()
