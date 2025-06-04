@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
+import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
 import ready_to_marry.userservice.budget.service.CoupleBudgetService;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 
@@ -72,6 +73,26 @@ public class CoupleBudgetController {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(0)
                 .message("Budget detail deleted successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 커플 총 예산 수정
+     *
+     * @param userId  게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
+     * @param request 총 예산 수정 요청 정보
+     * @return 성공 시 code=0, data=null
+     */
+    @PatchMapping("/total-budget")
+    public ResponseEntity<ApiResponse<Void>> updateTotalBudget(@RequestHeader("X-User-Id") Long userId, @RequestBody @Valid TotalBudgetUpdateRequest request) {
+        coupleBudgetService.updateTotalBudget(userId, request);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(0)
+                .message("Total budget updated successfully")
                 .data(null)
                 .build();
 
