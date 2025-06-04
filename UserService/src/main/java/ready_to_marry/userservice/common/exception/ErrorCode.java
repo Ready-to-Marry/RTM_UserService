@@ -13,6 +13,7 @@ public enum ErrorCode {
     ALREADY_CONNECTED_PARTNER(1104, "Target user is already connected"),
     ALREADY_RELEASED(1105, "Couple already released or not connected"),
     COUPLE_NOT_CONNECTED(1106, "User is not connected to a couple"),
+    TOTAL_BUDGET_ALREADY_EXISTS(1107, "Total budget already exists for this couple"),
 
     // 2xxx: 인프라(시스템) 오류
     DB_SAVE_FAILURE(2101, "System error occurred while saving data to the database"),

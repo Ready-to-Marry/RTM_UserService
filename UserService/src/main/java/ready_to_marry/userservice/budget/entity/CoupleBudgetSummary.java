@@ -26,8 +26,8 @@ public class CoupleBudgetSummary {
     @Column(name = "couple_id", nullable = false, unique = true)
     private UUID coupleId;
 
-    // 총 예산 (default = 0)
-    @Column(name = "total_budget", nullable = false)
+    // 총 예산
+    @Column(name = "total_budget")
     private Long totalBudget;
 
     // 총 지출 금액 (hall_spent + sdm_spent + ceremony_spent + supplies_spent + etc_spent)
@@ -35,7 +35,7 @@ public class CoupleBudgetSummary {
     private Long totalSpent;
 
     // 남은 예산 (total_budget - total_spent)
-    @Column(name = "remaining_budget", nullable = false)
+    @Column(name = "remaining_budget")
     private Long remainingBudget;
 
     // 웨딩홀 총 지출 금액 (default = 0)
