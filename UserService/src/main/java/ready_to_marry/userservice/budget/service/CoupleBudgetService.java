@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
 import ready_to_marry.userservice.common.exception.BusinessException;
 import ready_to_marry.userservice.common.exception.ForbiddenException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
@@ -116,4 +117,18 @@ public interface CoupleBudgetService {
      * @throws InfrastructureException  DB_SAVE_FAILURE
      */
     void deleteTotalBudget(Long userId);
+
+    /**
+     * 유저 ID 기준으로 해당 커플의 지출 요약 내역 조회
+     * 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+     * 2) 해당 커플의 지출 요약 내역 조회
+     * 3) 조회된 커플 지출 요약 내역을 응답 DTO로 매핑하여 반환
+     *
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @throws EntityNotFoundException  본인의 프로필이 존재하지 않는 경우
+     * @throws EntityNotFoundException  해당 coupleId의 커플 지출 요약 내역이 존재하지 않는 경우
+     * @throws BusinessException        COUPLE_NOT_CONNECTED
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     */
+    CoupleBudgetSummaryResponse getBudgetSummary(Long userId);
 }

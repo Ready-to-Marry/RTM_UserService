@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
 import ready_to_marry.userservice.budget.entity.CoupleBudgetDetail;
 import ready_to_marry.userservice.budget.entity.CoupleBudgetSummary;
 import ready_to_marry.userservice.budget.enums.BudgetCategory;
@@ -320,5 +321,37 @@ public class CoupleBudgetServiceImpl implements CoupleBudgetService {
             log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CoupleBudgetSummaryResponse getBudgetSummary(Long userId) {
+        // 1) 유저(userId)로부터 커플 아이디 조회 (커플 미등록 시 예외 발생)
+        UUID coupleId = userProfileService.getCoupleIdOrThrow(userId);
+
+        // 2) 해당 커플의 지출 요약 내역 조회
+        CoupleBudgetSummary summary;
+        try {
+            summary = coupleBudgetSummaryRepository.findByCoupleId(coupleId)
+                    .orElseThrow(() -> {
+                        log.error("Couple budget summary not found: identifierType=coupleId, identifierValue={}", MaskingUtils.maskCoupleId(coupleId));
+                        return new EntityNotFoundException("Couple budget summary not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=coupleId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskCoupleId(coupleId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 3) 조회된 커플 지출 요약 내역을 응답 DTO로 매핑하여 반환
+        return CoupleBudgetSummaryResponse.builder()
+                .totalBudget(summary.getTotalBudget())
+                .totalSpent(summary.getTotalSpent())
+                .remainingBudget(summary.getRemainingBudget())
+                .hallSpent(summary.getHallSpent())
+                .sdmSpent(summary.getSdmSpent())
+                .ceremonySpent(summary.getCeremonySpent())
+                .suppliesSpent(summary.getSuppliesSpent())
+                .etcSpent(summary.getEtcSpent())
+                .build();
     }
 }

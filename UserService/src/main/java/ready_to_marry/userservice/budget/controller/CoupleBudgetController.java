@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ready_to_marry.userservice.budget.dto.request.BudgetDetailCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetCreateRequest;
 import ready_to_marry.userservice.budget.dto.request.TotalBudgetUpdateRequest;
+import ready_to_marry.userservice.budget.dto.response.CoupleBudgetSummaryResponse;
 import ready_to_marry.userservice.budget.service.CoupleBudgetService;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 
@@ -113,6 +114,25 @@ public class CoupleBudgetController {
                 .code(0)
                 .message("Total budget deleted successfully")
                 .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 커플 지출 요약 내역 조회
+     *
+     * @param userId  게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
+     * @return 성공 시 code=0, data=커플 지출 요약 내역 정보
+     */
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponse<CoupleBudgetSummaryResponse>> getBudgetSummary(@RequestHeader("X-User-Id") Long userId) {
+        CoupleBudgetSummaryResponse budgetSummary = coupleBudgetService.getBudgetSummary(userId);
+
+        ApiResponse<CoupleBudgetSummaryResponse> response = ApiResponse.<CoupleBudgetSummaryResponse>builder()
+                .code(0)
+                .message("Couple budget summary retrieved successfully")
+                .data(budgetSummary)
                 .build();
 
         return ResponseEntity.ok(response);
