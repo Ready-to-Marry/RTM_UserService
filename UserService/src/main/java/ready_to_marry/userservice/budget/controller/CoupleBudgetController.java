@@ -98,4 +98,23 @@ public class CoupleBudgetController {
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 커플 총 예산 삭제
+     *
+     * @param userId  게이트웨이가 파싱한 유저 도메인 ID (JWT에서 X-User-Id로 전달됨)
+     * @return 성공 시 code=0, data=null
+     */
+    @DeleteMapping("/total-budget")
+    public ResponseEntity<ApiResponse<Void>> deleteTotalBudget(@RequestHeader("X-User-Id") Long userId) {
+        coupleBudgetService.deleteTotalBudget(userId);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .code(0)
+                .message("Total budget deleted successfully")
+                .data(null)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }
