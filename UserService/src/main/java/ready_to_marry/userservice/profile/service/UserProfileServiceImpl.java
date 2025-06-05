@@ -36,26 +36,21 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional
-    public InternalProfileCreateResponse createInternalProfile(InternalProfileCreateRequest request) {
+    public Long createInternalProfile(InternalProfileCreateRequest request) {
         // 1) 전달받은 name, phone 값으로 UserProfile 엔티티 생성
         UserProfile profile = UserProfile.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .build();
 
-        UserProfile savedUserProfile;
         try {
             // 2) user_profile 테이블에 저장
-            savedUserProfile = userProfileRepository.save(profile);
+            userProfileRepository.save(profile);
+            return profile.getUserId();
         } catch (DataAccessException ex) {
             log.error("{}: identifierType=phone, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskPhone(request.getPhone()), ex);
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
-
-        // 3) 생성된 userId를 포함한 응답 DTO 반환
-        return InternalProfileCreateResponse.builder()
-                .userId(savedUserProfile.getUserId())
-                .build();
     }
 
     @Override
