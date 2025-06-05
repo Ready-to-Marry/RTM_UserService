@@ -54,6 +54,9 @@ dependencies {
     // AWS SDK for S3
     implementation 'software.amazon.awssdk:s3:2.20.124'
 
+    // AWS SDK for Dynamodb
+    implementation 'software.amazon.awssdk:dynamodb:2.20.124'
+
     // Service Discovery (Eureka Client)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
