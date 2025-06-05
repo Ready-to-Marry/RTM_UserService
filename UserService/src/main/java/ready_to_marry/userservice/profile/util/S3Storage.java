@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ready_to_marry.userservice.profile.config.S3Properties;
+import ready_to_marry.userservice.common.config.AwsProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -25,18 +25,18 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class S3Storage {
-    private final S3Properties s3Properties;
+    private final AwsProperties awsProperties;
     private S3Client s3Client;
 
     @PostConstruct
     public void init() {
          this.s3Client = S3Client.builder()
-                .region(Region.of(s3Properties.getRegion().getStaticRegion()))
+                .region(Region.of(awsProperties.getRegion().getStaticRegion()))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
                                 AwsBasicCredentials.create(
-                                        s3Properties.getCredentials().getAccessKey(),
-                                        s3Properties.getCredentials().getSecretKey()
+                                        awsProperties.getCredentials().getAccessKey(),
+                                        awsProperties.getCredentials().getSecretKey()
                                 )
                         )
                 )
@@ -57,7 +57,7 @@ public class S3Storage {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + extension;
 
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(s3Properties.getS3().getBucket())
+                .bucket(awsProperties.getS3().getBucket())
                 .key(fileName)
                 .contentType(multipartFile.getContentType())
                 .acl(ObjectCannedACL.PUBLIC_READ)
@@ -79,7 +79,7 @@ public class S3Storage {
     public void delete(String fileUrl) {
         String key = extractKeyFromUrl(fileUrl);
         DeleteObjectRequest request = DeleteObjectRequest.builder()
-                .bucket(s3Properties.getS3().getBucket())
+                .bucket(awsProperties.getS3().getBucket())
                 .key(key)
                 .build();
 
@@ -88,8 +88,8 @@ public class S3Storage {
 
     private String getFileUrl(String key) {
         return String.format("https://%s.s3.%s.amazonaws.com/%s",
-                s3Properties.getS3().getBucket(),
-                s3Properties.getRegion().getStaticRegion(),
+                awsProperties.getS3().getBucket(),
+                awsProperties.getRegion().getStaticRegion(),
                 key
         );
     }
