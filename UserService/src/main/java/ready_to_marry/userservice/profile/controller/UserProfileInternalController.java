@@ -28,10 +28,10 @@ public class UserProfileInternalController {
      * @return 성공 시 code=0, data=생성된 유저의 도메인 ID 정보
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<InternalProfileCreateResponse>> createProfile(@Valid @RequestBody InternalProfileCreateRequest request) {
-        InternalProfileCreateResponse result = userProfileService.createInternalProfile(request);
+    public ResponseEntity<ApiResponse<Long>> createProfile(@Valid @RequestBody InternalProfileCreateRequest request) {
+        Long result = userProfileService.createInternalProfile(request);
 
-        ApiResponse<InternalProfileCreateResponse> response = ApiResponse.<InternalProfileCreateResponse>builder()
+        ApiResponse<Long> response = ApiResponse.<Long>builder()
                 .code(0)
                 .message("User profile created successfully")
                 .data(result)

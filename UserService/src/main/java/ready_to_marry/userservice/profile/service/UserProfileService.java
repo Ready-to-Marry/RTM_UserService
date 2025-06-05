@@ -27,7 +27,7 @@ public interface UserProfileService {
      * @return InternalProfileCreateResponse    생성된 userId 포함 응답 DTO
      * @throws InfrastructureException          DB_SAVE_FAILURE
      */
-    InternalProfileCreateResponse createInternalProfile(InternalProfileCreateRequest request);
+    Long createInternalProfile(InternalProfileCreateRequest request);
 
     /**
      * 로그인한 유저의 프로필 정보 조회
