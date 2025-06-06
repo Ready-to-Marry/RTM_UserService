@@ -109,7 +109,6 @@ public final class MaskingUtils {
 
     /**
      * 커플 ID 부분 마스킹
-     *
      * 예: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d → 1a2b...5c6d
      */
     public static String maskCoupleId(UUID coupleId) {
@@ -123,5 +122,22 @@ public final class MaskingUtils {
         }
 
         return id.substring(0, 4) + "..." + id.substring(id.length() - 4);
+    }
+
+    /**
+     * ExclusiveStartKey(Base64) 문자열 부분 마스킹
+     * 예: 전체 길이가 40자라면, “앞 8자 + ... + 뒤 8자” 형태로 리턴
+     */
+    public static String maskExclusiveStartKey(String cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        int len = cursor.length();
+        if (len <= 16) {
+            return "*".repeat(len);
+        }
+        String head = cursor.substring(0, 8);
+        String tail = cursor.substring(len - 8);
+        return head + "..." + tail;
     }
 }

@@ -1,4 +1,4 @@
-package ready_to_marry.userservice.profile.config;
+package ready_to_marry.userservice.common.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,15 +6,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * application.properties의 S3 설정을 바인딩
+ * application.properties의 S3, DynamoDB 설정을 바인딩
  */
 @Getter
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "cloud.aws")
-public class S3Properties {
+public class AwsProperties {
     // S3 업로드에 사용할 버킷 이름 설정
     private S3 s3;
+
+    // DynamoDB 조회할 테이블 이름 설정
+    private Dynamodb dynamodb;
 
     // AWS 액세스 키 및 시크릿 키 설정
     private Credentials credentials;
@@ -26,6 +29,12 @@ public class S3Properties {
     @Setter
     public static class S3 {
         private String bucket;
+    }
+
+    @Getter
+    @Setter
+    public static class Dynamodb {
+        private String tableName;
     }
 
     @Getter
