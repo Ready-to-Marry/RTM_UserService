@@ -35,4 +35,16 @@ public interface FcmTokenService {
      * @throws InfrastructureException  DB_DELETE_FAILURE
      */
     void deleteToken(Long userId);
+
+    /**
+     * Internal API로 전달받은 userId로 해당 유저의 FCM 토큰을 조회
+     * 1) userId로 FcmToken 엔티티를 조회
+     * 2) 조회된 토큰(String) 반환
+     *
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @return String                   조회된 FCM 토큰 문자열
+     * @throws EntityNotFoundException  본인의 등록된 FCM 토큰 정보가 존재하지 않는 경우
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     */
+    String getInternalFcmToken(Long userId);
 }

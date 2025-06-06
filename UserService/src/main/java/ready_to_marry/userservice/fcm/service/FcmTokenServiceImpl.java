@@ -85,4 +85,22 @@ public class FcmTokenServiceImpl implements FcmTokenService {
             throw new InfrastructureException(ErrorCode.DB_DELETE_FAILURE, ex);
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getInternalFcmToken(Long userId) {
+        // 1) userId로 FcmToken 엔티티를 조회
+        try {
+            return fcmTokenRepository.findById(userId)
+                    // 2) 조회된 토큰(String) 반환
+                    .map(FcmToken::getToken)
+                    .orElseThrow(() -> {
+                        log.error("Fcm token not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("Fcm token not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+    }
 }
