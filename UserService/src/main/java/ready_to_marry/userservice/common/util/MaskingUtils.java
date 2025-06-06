@@ -132,12 +132,35 @@ public final class MaskingUtils {
         if (cursor == null) {
             return null;
         }
+
         int len = cursor.length();
+
         if (len <= 16) {
             return "*".repeat(len);
         }
+
         String head = cursor.substring(0, 8);
         String tail = cursor.substring(len - 8);
+        return head + "..." + tail;
+    }
+
+    /**
+     * FCM 토큰 부분 마스킹
+     * 예: abcd1234xyz → *********** / abcdefghijklmnopq → abcdefgh...jklmnopq
+     */
+    public static String maskFcmToken(String token) {
+        if (token == null) {
+            return null;
+        }
+
+        int len = token.length();
+
+        if (len <= 16) {
+            return "*".repeat(len);
+        }
+
+        String head = token.substring(0, 8);
+        String tail = token.substring(len - 8);
         return head + "..." + tail;
     }
 }
