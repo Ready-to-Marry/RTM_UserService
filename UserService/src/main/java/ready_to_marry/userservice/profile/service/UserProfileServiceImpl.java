@@ -13,6 +13,8 @@ import ready_to_marry.userservice.common.exception.ErrorCode;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 import ready_to_marry.userservice.common.exception.ValidationException;
 import ready_to_marry.userservice.common.util.MaskingUtils;
+import ready_to_marry.userservice.fcm.dto.request.FcmTokenCreateOrUpdateRequest;
+import ready_to_marry.userservice.fcm.service.FcmTokenService;
 import ready_to_marry.userservice.profile.dto.request.CoupleConnectRequest;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
@@ -32,6 +34,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final S3Storage s3Storage;
     private final InviteCodeService inviteCodeService;
+    private final FcmTokenService fcmTokenService;
 
     @Override
     @Transactional
@@ -45,13 +48,24 @@ public class UserProfileServiceImpl implements UserProfileService {
         try {
             // 2) user_profile 테이블에 저장
             userProfileRepository.save(profile);
-
-            // 3) 생성된 userId 반환
-            return profile.getUserId();
         } catch (DataAccessException ex) {
             log.error("{}: identifierType=phone, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskPhone(request.getPhone()), ex);
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
         }
+
+        // 3) 푸시 알림 허용 시에만 전달되는 FCM 토큰 등록
+        String token = request.getFcmToken();
+
+        if (token != null && !token.isBlank()) {
+            FcmTokenCreateOrUpdateRequest createRequest = FcmTokenCreateOrUpdateRequest.builder()
+                    .token(token)
+                    .build();
+
+            fcmTokenService.saveOrUpdateToken(profile.getUserId(), createRequest);
+        }
+
+        // 4) 생성된 userId 반환
+        return profile.getUserId();
     }
 
     @Override

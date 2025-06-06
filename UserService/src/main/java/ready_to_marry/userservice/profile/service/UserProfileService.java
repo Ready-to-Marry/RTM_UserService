@@ -17,13 +17,15 @@ import java.util.UUID;
  */
 public interface UserProfileService {
     /**
-     * Internal API로 전달받은 최소 프로필 정보(name, phone)를 저장
+     * Internal API로 전달받은 최소 프로필 정보(name, phone)를 저장 + 푸시 알림 허용 시에만 전달되는 FCM 토큰 등록
      * 1) 전달받은 name, phone 값으로 UserProfile 엔티티 생성
      * 2) user_profile 테이블에 저장
-     * 3) 생성된 userId 반환
+     * 3) 푸시 알림 허용 시에만 전달되는 FCM 토큰 등록
+     * 4) 생성된 userId 반환
      *
-     * @param request                           name, phone 포함 요청 DTO
+     * @param request                           name, phone, fcmToken 포함 요청 DTO
      * @return Long                             생성된 userId
+     * @throws InfrastructureException          DB_RETRIEVE_FAILURE
      * @throws InfrastructureException          DB_SAVE_FAILURE
      */
     Long createInternalProfile(InternalProfileCreateRequest request);
