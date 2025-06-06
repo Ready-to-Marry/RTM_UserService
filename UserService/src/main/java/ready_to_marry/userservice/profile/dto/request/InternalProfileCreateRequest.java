@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 /**
- * Internal API를 통해 전달되는 유저 프로필 등록 요청 DTO
+ * Internal API를 통해 전달되는 유저 프로필 + FCM 토큰 등록 요청 DTO
  *
- * Auth Service가 소셜 로그인 후 User Service에 프로필 생성 요청을
+ * Auth Service가 소셜 로그인 후 User Service에 프로필 생성 및 FCM 토큰 등록 요청을
  * 보낼 때 사용하는 내부용 데이터 모델
  */
 @Getter
@@ -26,4 +26,8 @@ public class InternalProfileCreateRequest {
     @NotBlank
     @Pattern(regexp = "^\\+?[0-9\\-]{1,20}$")
     private String phone;
+
+    // 유저 FCM 토큰(푸시 알림 허용 시에만 전달됨)
+    @Size(max = 255)
+    private String fcmToken;
 }

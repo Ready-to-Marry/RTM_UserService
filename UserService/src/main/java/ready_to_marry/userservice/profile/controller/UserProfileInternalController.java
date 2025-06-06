@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
-import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.service.UserProfileService;
 
 /**
@@ -22,7 +21,7 @@ public class UserProfileInternalController {
     private final UserProfileService userProfileService;
 
     /**
-     * 최소 정보(name, phone)로 유저 프로필 등록
+     * 최소 정보(name, phone)로 유저 프로필 등록 + 푸시 알림 허용 시에만 전달되는 FCM 토큰 등록
      *
      * @param request 유저 프로필 등록 요청 정보
      * @return 성공 시 code=0, data=생성된 유저의 도메인 ID 정보
