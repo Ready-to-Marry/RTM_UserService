@@ -1,5 +1,6 @@
 package ready_to_marry.userservice.fcm.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -57,6 +58,31 @@ public class FcmTokenServiceImpl implements FcmTokenService {
         } catch (DataAccessException ex) {
             log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
             throw new InfrastructureException(ErrorCode.DB_SAVE_FAILURE, ex);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteToken(Long userId) {
+        // 1) userId로 기존 FcmToken을 조회
+        FcmToken fcmToken;
+        try {
+            fcmToken = fcmTokenRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.error("Fcm token not found: identifierType=userId, identifierValue={}", MaskingUtils.maskUserId(userId));
+                        return new EntityNotFoundException("Fcm token not found");
+                    });
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+
+        // 2) 삭제
+        try {
+            fcmTokenRepository.delete(fcmToken);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_DELETE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_DELETE_FAILURE, ex);
         }
     }
 }

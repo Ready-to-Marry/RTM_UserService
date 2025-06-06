@@ -1,5 +1,6 @@
 package ready_to_marry.userservice.fcm.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import ready_to_marry.userservice.common.exception.InfrastructureException;
 import ready_to_marry.userservice.fcm.dto.request.FcmTokenCreateOrUpdateRequest;
 
@@ -22,4 +23,16 @@ public interface FcmTokenService {
      * @throws InfrastructureException  DB_SAVE_FAILURE
      */
     void saveOrUpdateToken(Long userId, FcmTokenCreateOrUpdateRequest request);
+
+    /**
+     * 현재 로그인한 유저의 FCM 토큰을 삭제
+     * 1) userId로 기존 FcmToken을 조회
+     * 2) 삭제
+     *
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @throws EntityNotFoundException  본인의 등록된 FCM 토큰 정보가 존재하지 않는 경우
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException  DB_DELETE_FAILURE
+     */
+    void deleteToken(Long userId);
 }
