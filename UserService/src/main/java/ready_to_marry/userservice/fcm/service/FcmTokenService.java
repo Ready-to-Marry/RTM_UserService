@@ -16,10 +16,10 @@ public interface FcmTokenService {
      * 1-2) 해당 userId의 토큰이 존재하지 않는 경우 → 새로운 엔티티 생성
      * 2) 저장 혹은 업데이트
      *
-     * @param userId            X-User-Id 헤더에서 전달받은 유저 도메인 ID
-     * @param request           유저의 FCM 토큰 등록/업데이트 요청 DTO
-     * @throws InfrastructureException DB_RETRIEVE_FAILURE
-     * @throws InfrastructureException DB_SAVE_FAILURE
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @param request                   유저의 FCM 토큰 등록/업데이트 요청 DTO
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     * @throws InfrastructureException  DB_SAVE_FAILURE
      */
     void saveOrUpdateToken(Long userId, FcmTokenCreateOrUpdateRequest request);
 }
