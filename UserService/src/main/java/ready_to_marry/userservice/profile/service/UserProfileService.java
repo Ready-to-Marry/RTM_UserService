@@ -7,7 +7,6 @@ import ready_to_marry.userservice.common.exception.ValidationException;
 import ready_to_marry.userservice.profile.dto.request.CoupleConnectRequest;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
-import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
 import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 
@@ -21,10 +20,10 @@ public interface UserProfileService {
      * Internal API로 전달받은 최소 프로필 정보(name, phone)를 저장
      * 1) 전달받은 name, phone 값으로 UserProfile 엔티티 생성
      * 2) user_profile 테이블에 저장
-     * 3) 생성된 userId를 포함한 응답 DTO 반환
+     * 3) 생성된 userId 반환
      *
      * @param request                           name, phone 포함 요청 DTO
-     * @return InternalProfileCreateResponse    생성된 userId 포함 응답 DTO
+     * @return Long                             생성된 userId
      * @throws InfrastructureException          DB_SAVE_FAILURE
      */
     Long createInternalProfile(InternalProfileCreateRequest request);

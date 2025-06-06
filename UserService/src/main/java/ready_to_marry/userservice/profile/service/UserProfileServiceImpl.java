@@ -16,7 +16,6 @@ import ready_to_marry.userservice.common.util.MaskingUtils;
 import ready_to_marry.userservice.profile.dto.request.CoupleConnectRequest;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
 import ready_to_marry.userservice.profile.dto.request.ProfileUpdateRequest;
-import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.dto.response.InviteCodeIssueResponse;
 import ready_to_marry.userservice.profile.dto.response.UserProfileResponse;
 import ready_to_marry.userservice.profile.entity.UserProfile;
@@ -46,6 +45,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         try {
             // 2) user_profile 테이블에 저장
             userProfileRepository.save(profile);
+
+            // 3) 생성된 userId 반환
             return profile.getUserId();
         } catch (DataAccessException ex) {
             log.error("{}: identifierType=phone, identifierValue={}", ErrorCode.DB_SAVE_FAILURE.getMessage(), MaskingUtils.maskPhone(request.getPhone()), ex);

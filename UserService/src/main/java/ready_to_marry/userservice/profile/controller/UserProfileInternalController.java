@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ready_to_marry.userservice.common.dto.response.ApiResponse;
 import ready_to_marry.userservice.profile.dto.request.InternalProfileCreateRequest;
-import ready_to_marry.userservice.profile.dto.response.InternalProfileCreateResponse;
 import ready_to_marry.userservice.profile.service.UserProfileService;
 
 /**
