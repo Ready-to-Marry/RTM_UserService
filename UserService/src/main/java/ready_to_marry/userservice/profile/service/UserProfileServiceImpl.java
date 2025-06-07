@@ -84,12 +84,16 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
         }
 
-        // 2) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부를 포함한 응답 DTO 반환
+        // 2) FCM 토큰 존재 여부로 푸시 허용 여부 판단
+        boolean pushEnabled = fcmTokenService.existsByUserId(userId);
+
+        // 3) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부, 유저 푸시 알림 허용 여부를 포함한 응답 DTO 반환
         return UserProfileResponse.builder()
                 .name(profile.getName())
                 .phone(profile.getPhone())
                 .profileImgUrl(profile.getProfileImgUrl())
                 .connectedCouple(profile.getCoupleId() != null)
+                .pushNotificationEnabled(pushEnabled)
                 .build();
     }
 

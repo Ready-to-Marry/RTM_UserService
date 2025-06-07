@@ -3,7 +3,7 @@ package ready_to_marry.userservice.profile.dto.response;
 import lombok.*;
 
 /**
- * 로그인한 유저의 프로필 조회 결과 응답 DTO
+ * 로그인한 유저의 프로필 조회 결과 + 유저 푸시 알림 허용 여부 응답 DTO
  */
 @Getter
 @Setter
@@ -22,4 +22,7 @@ public class UserProfileResponse {
 
     // 커플 연결 여부
     private boolean connectedCouple;
+
+    // 유저 푸시 알림 허용 여부
+    private boolean pushNotificationEnabled;
 }

@@ -47,4 +47,14 @@ public interface FcmTokenService {
      * @throws InfrastructureException  DB_RETRIEVE_FAILURE
      */
     String getInternalFcmToken(Long userId);
+
+    /**
+     * 현재 로그인한 유저의 FCM 토큰이 저장되어 있는지 확인
+     * 1) userId로 저장된 FcmToken이 존재하는지 확인
+     *
+     * @param userId                    X-User-Id 헤더에서 전달받은 유저 도메인 ID
+     * @return boolean                  토큰이 있으면 true, 없으면 false
+     * @throws InfrastructureException  DB_RETRIEVE_FAILURE
+     */
+    boolean existsByUserId(Long userId);
 }

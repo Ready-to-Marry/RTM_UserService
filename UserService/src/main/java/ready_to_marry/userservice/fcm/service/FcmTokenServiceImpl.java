@@ -103,4 +103,16 @@ public class FcmTokenServiceImpl implements FcmTokenService {
             throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByUserId(Long userId) {
+        // 1) userId로 저장된 FcmToken이 존재하는지 확인
+        try {
+            return fcmTokenRepository.existsById(userId);
+        } catch (DataAccessException ex) {
+            log.error("{}: identifierType=userId, identifierValue={}", ErrorCode.DB_RETRIEVE_FAILURE.getMessage(), MaskingUtils.maskUserId(userId), ex);
+            throw new InfrastructureException(ErrorCode.DB_RETRIEVE_FAILURE, ex);
+        }
+    }
 }
