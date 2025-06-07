@@ -68,6 +68,9 @@ dependencies {
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly     'org.junit.platform:junit-platform-launcher'
+
+    // kafka 의존성
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {

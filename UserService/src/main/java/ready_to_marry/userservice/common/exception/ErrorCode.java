@@ -27,6 +27,9 @@ public enum ErrorCode {
     INVITE_CODE_GENERATION_FAILURE(2108, "System error occurred while generating unique invite code after multiple attempts"),
     EXCLUSIVE_KEY_ENCODING_FAILURE(2109, "System error occurred while encoding DynamoDB ExclusiveStartKey"),
     EXCLUSIVE_KEY_DECODING_FAILURE(2110, "System error occurred while decoding DynamoDB ExclusiveStartKey"),
+    KAFKA_SERIALIZATION_ERROR(2601, "Failed to serialization message to Kafka"),
+    KAFKA_CONNECTION_ERROR(2602, "Failed to connect to Kafka broker"),
+    UNKNOWN_ERROR(2603, "Unknown error"),
 
     // 3xxx: 보안 및 인가 오류
     FORBIDDEN(3101, "You do not have permission to access this resource");
