@@ -1,4 +1,4 @@
-package ready_to_marry.userservice.coupon;
+package ready_to_marry.userservice.coupon.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
