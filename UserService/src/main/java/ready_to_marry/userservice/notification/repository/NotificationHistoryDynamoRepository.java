@@ -34,6 +34,7 @@ public class NotificationHistoryDynamoRepository implements NotificationHistoryR
     @Override
     public List<NotificationHistoryResponse> findByUserId(String userId, DynamoPagingRequest pagingRequest) {
         // 1) QueryRequest 빌더 생성
+        userId = "user" + userId;
         QueryRequest.Builder queryBuilder = QueryRequest.builder()
                 .tableName(awsProperties.getDynamodb().getTableName())
                 .keyConditionExpression("id = :userId")
