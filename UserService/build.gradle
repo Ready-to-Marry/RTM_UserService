@@ -30,23 +30,44 @@ dependencyManagement {
 }
 
 dependencies {
+    // Web & Actuator
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // PostgreSQL JDBC Driver
-    implementation 'org.postgresql:postgresql:42.2.5'
-
-    // Spring Boot Actuator (Health Check용)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // eureka client
+    // Retry & AOP
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // Database (JPA + PostgreSQL)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly    'org.postgresql:postgresql:42.2.5'
+
+    // Key-Value Store (Redis)
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // String utilities
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // AWS SDK for S3
+    implementation 'software.amazon.awssdk:s3:2.20.124'
+
+    // AWS SDK for Dynamodb
+    implementation 'software.amazon.awssdk:dynamodb:2.20.124'
+
+    // Service Discovery (Eureka Client)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
+    // Dev Tools & Code Gen
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    compileOnly     'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly     'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
