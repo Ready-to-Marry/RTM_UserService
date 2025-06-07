@@ -33,10 +33,11 @@ public interface UserProfileService {
     /**
      * 로그인한 유저의 프로필 정보 조회
      * 1) 유저 프로필 조회
-     * 2) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부를 포함한 응답 DTO 반환
+     * 2) FCM 토큰 존재 여부로 푸시 허용 여부 판단
+     * 3) 실명(표시명), 연락처, 프로필 사진 저장 주소, 커플 연결 여부, 유저 푸시 알림 허용 여부를 포함한 응답 DTO 반환
      *
      * @param userId                        X-User-Id 헤더에서 전달받은 유저 도메인 ID
-     * @return UserProfileResponse          프로필 조회 결과 응답 DTO (유저 프로필 정보 및 커플 연결 여부 포함)
+     * @return UserProfileResponse          프로필 조회 결과 응답 DTO (유저 프로필 정보 및 커플 연결 여부 및 유저 푸시 알림 허용 여부 포함)
      * @throws EntityNotFoundException      유저 프로필이 존재하지 않는 경우
      * @throws InfrastructureException      DB_RETRIEVE_FAILURE
      */
